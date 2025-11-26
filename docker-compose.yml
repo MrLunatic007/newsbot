@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  newsbot:
+    build: .
+    container_name: telegram-news-bot
+    restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - HF_TOKEN=${HF_TOKEN}
+    env_file:
+      - .env
+    volumes:
+      # Mount logs directory
+      - ./logs:/app/logs
+      # Mount data directory for subscriptions
+      - ./data:/app/data
+    # Health check (optional)
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
